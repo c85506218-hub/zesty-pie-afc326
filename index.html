@@ -1,1 +1,848 @@
-{"id":"/index.html","path":"/index.html","sha":"8cce3b5af80e89f3ec5cca3c97a62d5c57698f7c","mime_type":"text/html","size":3038,"site_id":"94b119e5-929b-4ef7-8383-f7d6c4e9e2f9","deploy_id":"69fc7efcaa809000cf858131"}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>臺南市政府消防局 EAP 心理健康支持平台</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --green:#1a6b3c;--green-mid:#2d9554;--green-light:#e8f5ee;--green-border:#b8dfc8;
+  --gold:#b07800;--gold-light:#fff8e6;--gold-border:#e8cc80;
+  --red:#b83228;--red-light:#fdf0ef;--red-border:#f0b0aa;
+  --blue:#1a5fa0;--blue-light:#e8f0fb;--blue-border:#a0c0e8;
+  --purple:#5a3d9a;--purple-light:#f0eeff;--purple-border:#c0aaee;
+  --gray:#3a3a3a;--gray-mid:#666;--gray-light:#f6f6f4;--gray-border:#ddd;
+  --white:#fff;--r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--gray-light);color:var(--gray);min-height:100vh;font-size:14px}
+
+/* ── NAV ── */
+nav{background:var(--green);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-emblem{width:30px;height:30px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;user-select:none}
+.nav-title{color:#fff;font-size:14px;font-weight:700}
+.nav-sub{color:rgba(255,255,255,.65);font-size:11px;margin-top:1px}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;transition:.15s}
+.nav-tab:hover,.nav-tab.active{background:rgba(255,255,255,.18);color:#fff;font-weight:500}
+
+/* ── PAGES ── */
+.page{display:none;padding:20px;max-width:860px;margin:0 auto}
+.page.active{display:block}
+
+/* ── HERO BANNER ── */
+.hero{background:var(--white);border-radius:var(--r);padding:24px 24px 20px;margin-bottom:16px;border:1px solid var(--gray-border);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green) 0%,var(--gold) 60%,var(--red) 100%)}
+.hero-title{font-size:18px;font-weight:700;color:var(--green);margin-bottom:5px}
+.hero-desc{font-size:12px;color:var(--gray-mid);line-height:1.7}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:500}
+.badge-green{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+.badge-gold{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border)}
+.badge-blue{background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-border)}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--r);padding:20px;margin-bottom:14px;border:1px solid var(--gray-border)}
+.card-hd{font-size:13px;font-weight:700;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+
+/* ── MOOD ── */
+.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.mood-btn{border:1.5px solid var(--gray-border);border-radius:10px;padding:13px 4px 10px;text-align:center;cursor:pointer;background:var(--white);transition:.15s;font-family:inherit;user-select:none}
+.mood-btn:hover{border-color:#aaa;background:var(--gray-light)}
+.mood-btn.sel{border-width:2px}
+.mood-em{font-size:24px;margin-bottom:4px}
+.mood-lb{font-size:11px;color:var(--gray-mid);font-weight:500}
+.m-great.sel{border-color:var(--green-mid);background:var(--green-light)}
+.m-ok.sel{border-color:var(--blue);background:var(--blue-light)}
+.m-anxious.sel{border-color:var(--gold);background:var(--gold-light)}
+.m-sad.sel{border-color:var(--purple);background:var(--purple-light)}
+.m-angry.sel{border-color:var(--red);background:var(--red-light)}
+
+/* ── FORM ── */
+textarea{width:100%;border:1.5px solid var(--gray-border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--gray);resize:none;outline:none;line-height:1.65;transition:.15s}
+textarea:focus{border-color:var(--green)}
+.row-slider{display:flex;align-items:center;gap:10px;margin:14px 0 0}
+.row-slider label{font-size:12px;color:var(--gray-mid);min-width:56px}
+.row-slider input[type=range]{flex:1;accent-color:var(--green)}
+.slider-val{font-size:13px;font-weight:700;color:var(--green);min-width:20px;text-align:right}
+.stress-hint{font-size:11px;color:#aaa;margin-top:4px;display:flex;justify-content:space-between}
+
+/* ── BUTTON ── */
+.btn-primary{width:100%;margin-top:14px;padding:13px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:var(--green);color:#fff;border:none;border-radius:10px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{background:#155f34}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{background:#bbb;cursor:not-allowed}
+.btn-ghost{width:100%;margin-top:12px;padding:10px;font-size:13px;font-family:inherit;cursor:pointer;background:none;color:var(--gray-mid);border:1.5px solid var(--gray-border);border-radius:8px;transition:.15s}
+.btn-ghost:hover{border-color:#aaa;color:var(--gray)}
+
+/* ── LOADING ── */
+.loading{display:none;text-align:center;padding:28px;color:var(--gray-mid);font-size:13px}
+.spinner{width:26px;height:26px;border:3px solid var(--gray-border);border-top-color:var(--green);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESULT BANNER ── */
+.result-wrap{display:none;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.emo-banner{border-radius:10px;padding:16px 18px;margin-bottom:14px;border:1.5px solid}
+.emo-title{font-size:15px;font-weight:700;margin-bottom:7px}
+.emo-body{font-size:13px;line-height:1.75}
+.b-great{background:var(--green-light);border-color:#5dca8a;color:#0d4a25}
+.b-ok{background:var(--blue-light);border-color:var(--blue-border);color:#0d3d6e}
+.b-anxious{background:var(--gold-light);border-color:var(--gold-border);color:#5a3c00}
+.b-sad{background:var(--purple-light);border-color:var(--purple-border);color:#3a2070}
+.b-angry{background:var(--red-light);border-color:var(--red-border);color:#6b1212}
+
+/* ── RESOURCE CARDS ── */
+.sec-title{font-size:12px;font-weight:700;color:var(--gray-mid);margin:16px 0 9px;letter-spacing:.3px}
+.res-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.res-card{background:var(--white);border:1.5px solid var(--gray-border);border-radius:10px;padding:13px 14px;cursor:pointer;transition:.15s;text-decoration:none;color:inherit;display:block}
+.res-card:hover{border-color:var(--green);background:var(--green-light)}
+.res-type{font-size:10px;color:var(--gray-mid);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.res-name{font-size:13px;font-weight:700;color:var(--gray);line-height:1.4;margin-bottom:3px}
+.res-detail{font-size:11px;color:#999;line-height:1.4}
+.res-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-top:6px;font-weight:500}
+.tag-green{background:var(--green-light);color:var(--green)}
+.tag-gold{background:var(--gold-light);color:var(--gold)}
+.tag-red{background:var(--red-light);color:var(--red)}
+.tag-blue{background:var(--blue-light);color:var(--blue)}
+.tag-purple{background:var(--purple-light);color:var(--purple)}
+
+/* ── EAP FULL SECTION ── */
+.eap-box{background:var(--white);border-radius:var(--r);border:1px solid var(--gray-border);padding:20px;margin-top:14px}
+.eap-head{display:flex;align-items:center;gap:9px;padding-bottom:13px;border-bottom:1px solid var(--gray-border);margin-bottom:14px;flex-wrap:wrap}
+.eap-badge{background:var(--green);color:#fff;font-size:11px;padding:3px 9px;border-radius:6px;font-weight:700;white-space:nowrap}
+.eap-badge2{background:var(--red-light);color:var(--red);font-size:11px;padding:3px 9px;border-radius:6px;font-weight:700;border:1px solid var(--red-border);white-space:nowrap}
+.eap-head-title{font-size:14px;font-weight:700;color:var(--green)}
+.eap-head-note{font-size:11px;color:#aaa;margin-left:auto}
+.eap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.eap-card{border:1.5px solid var(--gray-border);border-radius:10px;padding:13px 14px;transition:.15s}
+.eap-card:hover{border-color:var(--green-mid)}
+.eap-card a{color:var(--blue);text-decoration:none;font-size:12px}
+.eap-card a:hover{text-decoration:underline}
+.eap-ct{font-size:13px;font-weight:700;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.eap-cs{font-size:12px;color:var(--gray-mid);line-height:1.65}
+.eap-hl{font-size:12px;font-weight:700;color:var(--green);margin-top:6px}
+.eap-phone{font-size:15px;font-weight:700;color:var(--red);letter-spacing:.5px}
+.info-strip{margin-top:12px;padding:11px 14px;background:var(--green-light);border-radius:8px;font-size:12px;color:var(--green);border:1px solid var(--green-border);line-height:1.7}
+.info-strip a{color:var(--blue);text-decoration:none;font-weight:500}
+.info-strip a:hover{text-decoration:underline}
+.ptsd-strip{margin-top:10px;padding:11px 14px;background:#fff8e6;border-radius:8px;font-size:12px;color:#6b4400;border:1px solid var(--gold-border);line-height:1.7}
+.ptsd-strip a{color:var(--blue);text-decoration:none;font-weight:500}
+.ptsd-strip a:hover{text-decoration:underline}
+
+/* ── DASHBOARD ── */
+.dash-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--white);border-radius:var(--r);padding:16px 14px;border:1px solid var(--gray-border);text-align:center}
+.kpi-num{font-size:26px;font-weight:700;color:var(--green)}
+.kpi-lbl{font-size:11px;color:var(--gray-mid);margin-top:3px}
+.chart-card{background:var(--white);border-radius:var(--r);padding:18px;border:1px solid var(--gray-border);margin-bottom:14px}
+.chart-title{font-size:13px;font-weight:700;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.charts-2col{display:grid;grid-template-columns:1fr 1.6fr;gap:14px;margin-bottom:14px}
+.tbl-wrap{background:var(--white);border-radius:var(--r);border:1px solid var(--gray-border);overflow:hidden;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--gray-light);padding:9px 13px;text-align:left;font-weight:700;color:var(--gray-mid);border-bottom:1px solid var(--gray-border)}
+td{padding:9px 13px;border-bottom:1px solid #f0f0ee;color:var(--gray)}
+tr:last-child td{border-bottom:none}
+.sbadge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+.s-hi{background:var(--red-light);color:var(--red)}
+.s-md{background:var(--gold-light);color:var(--gold)}
+.s-lo{background:var(--green-light);color:var(--green)}
+.alert-box{background:#fff8e6;border:1.5px solid var(--gold-border);border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:#5a3c00;line-height:1.7}
+.alert-box strong{font-weight:700}
+
+/* ── HR settings ── */
+.hr-settings{background:var(--blue-light);border:1px solid var(--blue-border);border-radius:var(--r);padding:16px 18px;margin-bottom:16px}
+.hr-settings-title{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.hr-settings-row{display:flex;gap:8px;align-items:center}
+.hr-settings-row input{flex:1;padding:8px 12px;border:1.5px solid var(--blue-border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:var(--white)}
+.hr-settings-row input:focus{border-color:var(--blue)}
+.hr-settings-btn{padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;white-space:nowrap}
+.hr-settings-btn:hover{background:#155288}
+.hr-settings-hint{font-size:11px;color:var(--blue);opacity:.7;margin-top:6px}
+.hr-refresh{font-size:12px;color:var(--gray-mid);cursor:pointer;padding:4px 10px;border:1px solid var(--gray-border);border-radius:6px;background:none;font-family:inherit}
+.hr-refresh:hover{border-color:#aaa}
+.dash-loading{text-align:center;padding:40px;color:var(--gray-mid);font-size:13px}
+
+/* ── HR 密碼 OVERLAY ── */
+.hr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center}
+.hr-overlay.show{display:flex}
+.hr-modal{background:var(--white);border-radius:var(--r);padding:32px 28px;width:320px;text-align:center;border:1px solid var(--gray-border)}
+.hr-modal-title{font-size:16px;font-weight:700;color:var(--blue);margin-bottom:6px}
+.hr-modal-sub{font-size:12px;color:var(--gray-mid);margin-bottom:20px;line-height:1.6}
+.hr-modal input{width:100%;padding:10px 14px;border:1.5px solid var(--gray-border);border-radius:8px;font-size:15px;font-family:inherit;text-align:center;letter-spacing:4px;outline:none;transition:.15s}
+.hr-modal input:focus{border-color:var(--blue)}
+.hr-modal input.err{border-color:var(--red);animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.hr-modal-btn{width:100%;margin-top:12px;padding:11px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:var(--blue);color:#fff;border:none;border-radius:8px;transition:.15s}
+.hr-modal-btn:hover{background:#155288}
+.hr-modal-cancel{margin-top:8px;background:none;border:none;font-size:12px;color:var(--gray-mid);cursor:pointer;font-family:inherit;padding:4px}
+.hr-modal-cancel:hover{color:var(--gray)}
+.hr-err-msg{font-size:12px;color:var(--red);margin-top:8px;min-height:18px}
+
+/* ── FOOTER ── */
+.footer{font-size:11px;color:#bbb;text-align:center;padding:20px 0 10px;line-height:1.8}
+.footer a{color:#bbb;text-decoration:none}
+
+@media(max-width:600px){
+  .charts-2col{grid-template-columns:1fr}
+  .dash-kpi{grid-template-columns:repeat(2,1fr)}
+  .eap-grid{grid-template-columns:1fr}
+  .res-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-emblem" ondblclick="window.location.href='dashboard.html'" title="管理人員專用">🚒</div>
+    <div>
+      <div class="nav-title">臺南市政府消防局 EAP</div>
+      <div class="nav-sub">員工心理健康支持平台</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="goPage('employee',this)">員工自助</button>
+    <button class="nav-tab" onclick="goPage('resource',this)">資源總覽</button>
+  </div>
+</nav>
+
+<!-- HR 密碼 OVERLAY -->
+<div class="hr-overlay" id="hr-overlay">
+  <div class="hr-modal">
+    <div class="hr-modal-title">🔒 HR 後台登入</div>
+    <div class="hr-modal-sub">此區域僅限 EAP 承辦人使用<br>請輸入管理密碼</div>
+    <input type="password" id="hr-pw" placeholder="••••••" maxlength="20"
+           onkeydown="if(event.key==='Enter')hrLogin()">
+    <div class="hr-err-msg" id="hr-err"></div>
+    <button class="hr-modal-btn" onclick="hrLogin()">進入後台</button>
+    <br><button class="hr-modal-cancel" onclick="closeHrLogin()">取消</button>
+  </div>
+</div>
+
+<!-- ═══════════════ 員工自助頁 ═══════════════ -->
+<div class="page active" id="page-employee">
+  <div class="hero">
+    <div class="hero-title">心理健康情緒評估</div>
+    <div class="hero-desc">
+      114–115 年度員工協助方案（EAP）。本表單完全匿名，AI 分析結果僅顯示給您本人，不回傳至主管或人事室。<br>
+      填寫後將依您的情緒狀態，自動推薦最適合的本局 EAP 與消防署資源。
+    </div>
+    <div class="badge-row">
+      <span class="badge badge-green">🔒 資料保密，不留存個資</span>
+      <span class="badge badge-gold">🚒 消防署 PTSD 專案可用</span>
+      <span class="badge badge-blue">💬 AI 情緒分析</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <svg width="17" height="17" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
+      現在的心情比較像哪一種？
+    </div>
+    <div class="mood-grid">
+      <button class="mood-btn m-great" onclick="pick('great',this)">
+        <div class="mood-em">😊</div><div class="mood-lb">開心平靜</div>
+      </button>
+      <button class="mood-btn m-ok" onclick="pick('ok',this)">
+        <div class="mood-em">😐</div><div class="mood-lb">還好普通</div>
+      </button>
+      <button class="mood-btn m-anxious" onclick="pick('anxious',this)">
+        <div class="mood-em">😰</div><div class="mood-lb">焦慮緊張</div>
+      </button>
+      <button class="mood-btn m-sad" onclick="pick('sad',this)">
+        <div class="mood-em">😔</div><div class="mood-lb">低落疲憊</div>
+      </button>
+      <button class="mood-btn m-angry" onclick="pick('angry',this)">
+        <div class="mood-em">😤</div><div class="mood-lb">憤怒壓抑</div>
+      </button>
+    </div>
+
+    <div class="card-hd" style="margin-bottom:9px">
+      <svg width="17" height="17" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      用幾句話說說你最近的狀態（選填）
+    </div>
+    <textarea id="txt" rows="3" placeholder="例如：最近執勤頻率增加，常常睡不好，回到家已經沒力氣陪家人，對什麼都提不起勁…"></textarea>
+
+    <div class="row-slider">
+      <label>壓力程度</label>
+      <input type="range" min="1" max="10" value="5" step="1" id="stress"
+             oninput="document.getElementById('sv').textContent=this.value">
+      <span class="slider-val" id="sv">5</span>
+    </div>
+    <div class="stress-hint"><span>1 很輕鬆</span><span>10 壓力極大</span></div>
+
+    <button class="btn-primary" id="analyzeBtn" onclick="analyze()">
+      <svg width="17" height="17" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      分析我的情緒狀態並推薦資源
+    </button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>AI 正在分析你的情緒狀態，為你配對最適合的資源…
+  </div>
+
+  <div class="result-wrap" id="result-wrap">
+    <div class="emo-banner" id="emo-banner">
+      <div class="emo-title" id="emo-title"></div>
+      <div class="emo-body" id="emo-body"></div>
+    </div>
+
+    <div id="suggest-res"></div>
+
+    <div class="eap-box">
+      <div class="eap-head">
+        <span class="eap-badge">本局 EAP</span>
+        <span class="eap-badge2">🔥 消防署 PTSD 專案</span>
+        <div class="eap-head-title">心理諮商服務完整管道</div>
+        <div class="eap-head-note">每人每年至少 4–6 次，申請轉介全程保密</div>
+      </div>
+      <div class="eap-grid">
+        <div class="eap-card">
+          <div class="eap-ct">🏛 本局人事室申請（EAP）</div>
+          <div class="eap-cs">需透過<strong>本局人事室轉介</strong>申請，<br>由人事室協助媒合諮商機構，費用由方案經費支應<br><strong>每人每年 4 小時</strong></div>
+          <div class="eap-hl">
+            <a href="https://personnel.tainan.gov.tw/eap/index.aspx" target="_blank">→ 前往 EAP 關懷網（填具資料）↗</a><br>
+            <span style="font-size:11px;color:#888;margin-top:4px;display:block">填表後聯繫人事室，由承辦人辦理轉介</span>
+          </div>
+        </div>
+        <div class="eap-card">
+          <div class="eap-ct">🔥 內政部消防署 PTSD 專案</div>
+          <div class="eap-cs"><a href="https://www.facebook.com/share/p/1DuQayTHa6/" target="_blank" style="color:inherit;font-weight:700">謐時光心理諮商所</a><br>服務時間：平日 09:00–20:00<br>壓力檢測、減壓團體、個別諮商<br><strong>每人每年 6 次（可申請延長）</strong></div>
+          <div class="eap-hl">
+            服務專線：<span class="eap-phone">03-3128327</span><br>
+            <a href="https://www.facebook.com/share/p/1DuQayTHa6/" target="_blank" style="display:inline-flex;align-items:center;gap:5px;margin-top:6px;background:#06c755;color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:20px;text-decoration:none">加入官方 LINE 直接預約</a><br>
+            <span style="font-size:11px;color:#888;margin-top:4px;display:block">無需透過機關轉介，個人可直接申請</span>
+          </div>
+        </div>
+        <div class="eap-card">
+          <div class="eap-ct">📞 衛福部各類諮詢專線</div>
+          <div class="eap-cs">安心專線：<span class="eap-phone">1925</span>（24h 全年）<br>張老師專線：<span class="eap-phone">1980</span><br>生命線：<span class="eap-phone">1995</span><br>男性關懷：<span class="eap-phone">0800-013-999</span>（每日 07–23h）<br>113 保護專線：<span class="eap-phone">113</span>（24h）</div>
+          <div class="eap-hl"><a href="https://www.mohw.gov.tw/fp-23-135-1.html" target="_blank">→ 衛福部完整專線一覽 ↗</a></div>
+        </div>
+        <div class="eap-card">
+          <div class="eap-ct">🏥 臺南市衛生局資源</div>
+          <div class="eap-cs">市民免費心理諮商（2 小時）<br>預約：<span class="eap-phone">06-2679751 轉 168</span><br>線上預約：臺南市社區心理衛生中心「好心情」粉絲頁</div>
+          <div class="eap-hl"><a href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/06134-%E8%87%BA%E5%8D%97%E5%B8%82%E5%BF%83%E7%90%86%E8%A1%9B%E7%94%9F%E4%B8%AD%E5%BF%83%E6%9C%8D%E5%8B%99%E8%B3%87%E6%BA%90.pdf" target="_blank">→ 下載心衛中心資源 PDF ↗</a></div>
+        </div>
+      </div>
+      <div class="info-strip">
+        📋 <strong>表單與資源下載：</strong>
+        <a href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/21329-%E5%BF%83%E7%90%86%E8%AB%AE%E5%95%86%E7%9B%B8%E9%97%9C%E8%B3%87%E6%BA%90.pdf" target="_blank">心理諮商相關資源 PDF ↗</a>
+        <a href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/49357-%E8%87%BA%E5%8D%97%E5%B8%82%E6%94%BF%E5%BA%9C%E6%9A%A8%E6%89%80%E5%B1%AC%E6%A9%9F%E9%97%9C%E5%AD%B8%E6%A0%A1%E5%93%A1%E5%B7%A5%E5%8D%94%E5%8A%A9%E6%96%B9%E6%A1%88%E6%9C%8D%E5%8B%99%E8%B3%87%E6%BA%90%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf" target="_blank">EAP 服務資源一覽表 PDF ↗</a>
+        <a href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/0430%E8%87%BA%E5%8D%97%E5%B8%82%E6%94%BF%E5%BA%9C%E6%9A%A8%E6%89%80%E5%B1%AC%E6%A9%9F%E9%97%9C%E5%AD%B8%E6%A0%A1%E6%80%A7%E9%A8%B7%E6%93%BE%E5%8F%8A%E8%81%B7%E5%A0%B4%E9%9C%B8%E5%87%8C%E8%A2%AB%E5%AE%B3%E4%BA%BA%E9%98%B2%E6%B2%BB%E6%9C%8D%E5%8B%99%E8%B3%87%E6%BA%90%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf" target="_blank">性騷擾防治服務資源 PDF ↗</a>
+      </div>
+      <div class="ptsd-strip">
+        🚒 <strong>消防署 PTSD 專案申請說明：</strong>
+        壓力檢測每人 2 次（$550/次）、個別諮商每人每年 6 次（$2,200/次，費用全由消防署支應）。<br>
+        <strong><a href="https://www.facebook.com/share/p/1DuQayTHa6/" target="_blank" style="color:inherit">個人可直接加入謐時光官方 LINE 申請</a>，無需透過機關轉介。</strong>機關若需辦理團體諮商，則由人事室以公文向消防署申請。
+        <a href="#" onclick="goPage('resource',document.querySelectorAll('.nav-tab')[1]);return false">→ 查看完整申請流程 ↗</a>
+      </div>
+    </div>
+
+    <button class="btn-ghost" onclick="reset()">重新評估</button>
+  </div>
+
+  <div class="footer">
+    本平台依據臺南市政府消防局 114–115 年度推動員工協助方案執行計畫建置<br>
+    AI 情緒分析僅供參考，不構成醫療診斷。如有緊急心理危機請立即撥打 <strong>1925</strong><br>
+    <a href="https://personnel.tainan.gov.tw/eap/index.aspx" target="_blank">臺南市政府 EAP 員工協助及福利關懷網</a>
+  </div>
+</div>
+
+<!-- ═══════════════ 資源總覽頁 ═══════════════ -->
+<div class="page" id="page-resource">
+  <div class="hero">
+    <div class="hero-title" style="color:var(--blue)">EAP 資源總覽 · 申請流程</div>
+    <div class="hero-desc">114–115 年度全部可用的心理健康資源，含申請方式、費用、聯絡資訊與下載連結</div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd" style="color:var(--red)">🔥 內政部消防署 PTSD 心理專家協助團隊</div>
+    <div style="font-size:13px;color:var(--gray-mid);line-height:1.8;margin-bottom:14px">
+      消防同仁因執行火災預防、災害搶救及緊急救護等勤（業）務，長期處於高危險性環境，本專案由內政部消防署委託<strong><a href="https://www.facebook.com/share/p/1DuQayTHa6/" target="_blank" style="color:inherit">謐時光心理諮商所</a></strong>提供服務，費用全由消防署相關經費支應。
+    </div>
+    <div class="res-grid" style="margin-bottom:14px">
+      <div style="background:var(--red-light);border:1.5px solid var(--red-border);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px">壓力檢測</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.7">每人 2 次 · 含個別報告與建議<br>費用：550 元／次（署方支應）</div>
+      </div>
+      <div style="background:var(--gold-light);border:1.5px solid var(--gold-border);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">團體諮商（減壓活動）</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.7">每場 1.5 小時 · 每團至多 2 次<br>3–10 人 · 費用：6,000 元／場</div>
+      </div>
+      <div style="background:var(--purple-light);border:1.5px solid var(--purple-border);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">心理衛教活動（預防性）</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.7">每縣市每年至少 1 次<br>每場 3 小時 · 費用：9,000 元</div>
+      </div>
+      <div style="background:var(--green-light);border:1.5px solid var(--green-border);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">個別諮商</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.7">每人每年 6 次（可申請延長）<br>費用：2,200 元／次（署方支應）</div>
+      </div>
+    </div>
+    <div style="background:var(--gray-light);border-radius:8px;padding:13px 15px;font-size:12px;color:var(--gray-mid);line-height:1.8">
+      <strong>如何申請：</strong><br>
+      ① 個人申請：<a href="https://www.facebook.com/share/p/1DuQayTHa6/" target="_blank">加入謐時光官方 LINE</a> → 輸入姓名、填寫申請表單 → 媒合心理師<br>
+      ② 機關申請：由人事室以公文向消防署提出，情節急迫可先以電子郵件申請後補公文<br><br>
+      <strong>聯絡窗口：</strong>消防署人事室劉小姐 <strong>02-81966526</strong> ｜ <a href="https://www.facebook.com/share/p/1DuQayTHa6/" target="_blank" style="color:inherit">謐時光心理諮商所</a> <strong>03-3128327</strong>（平日 09:00–20:00）
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd" style="color:var(--green)">🏛 臺南市政府 EAP 員工協助方案</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://personnel.tainan.gov.tw/eap/index.aspx" target="_blank">
+        <div class="res-type">🔗 官方入口</div><div class="res-name">EAP 員工協助及福利關懷網</div>
+        <div class="res-detail">填具申請資料、諮詢服務入口</div><span class="res-tag tag-green">前往網站 ↗</span>
+      </a>
+      <a class="res-card" href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/21329-%E5%BF%83%E7%90%86%E8%AB%AE%E5%95%86%E7%9B%B8%E9%97%9C%E8%B3%87%E6%BA%90.pdf" target="_blank">
+        <div class="res-type">📄 PDF 下載</div><div class="res-name">心理諮商相關資源總表</div>
+        <div class="res-detail">含各諮商機構清單與聯絡方式</div><span class="res-tag tag-blue">下載 PDF ↗</span>
+      </a>
+      <a class="res-card" href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/49357-%E8%87%BA%E5%8D%97%E5%B8%82%E6%94%BF%E5%BA%9C%E6%9A%A8%E6%89%80%E5%B1%AC%E6%A9%9F%E9%97%9C%E5%AD%B8%E6%A0%A1%E5%93%A1%E5%B7%A5%E5%8D%94%E5%8A%A9%E6%96%B9%E6%A1%88%E6%9C%8D%E5%8B%99%E8%B3%87%E6%BA%90%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf" target="_blank">
+        <div class="res-type">📄 PDF 下載</div><div class="res-name">EAP 服務資源一覽表</div>
+        <div class="res-detail">各類服務資源完整清單</div><span class="res-tag tag-blue">下載 PDF ↗</span>
+      </a>
+      <a class="res-card" href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/0430%E8%87%BA%E5%8D%97%E5%B8%82%E6%94%BF%E5%BA%9C%E6%9A%A8%E6%89%80%E5%B1%AC%E6%A9%9F%E9%97%9C%E5%AD%B8%E6%A0%A1%E6%80%A7%E9%A8%B7%E6%93%BE%E5%8F%8A%E8%81%B7%E5%A0%B4%E9%9C%B8%E5%87%8C%E8%A2%AB%E5%AE%B3%E4%BA%BA%E9%98%B2%E6%B2%BB%E6%9C%8D%E5%8B%99%E8%B3%87%E6%BA%90%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf" target="_blank">
+        <div class="res-type">📄 PDF 下載</div><div class="res-name">性騷擾及職場霸凌防治資源</div>
+        <div class="res-detail">服務資源一覽表</div><span class="res-tag tag-blue">下載 PDF ↗</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">📞 緊急與外部資源</div>
+    <div class="res-grid">
+      <div class="res-card" style="cursor:default"><div class="res-type">🆘 24 小時</div><div class="res-name">1925 安心專線</div><div class="res-detail">全年無休免費心理諮詢</div><span class="res-tag tag-red">直接撥打</span></div>
+      <div class="res-card" style="cursor:default"><div class="res-type">💛 情感支持</div><div class="res-name">1980 張老師專線</div><div class="res-detail">週一至六提供情緒輔導</div><span class="res-tag tag-gold">直接撥打</span></div>
+      <a class="res-card" href="https://personnel.tainan.gov.tw/personnel/warehouse/G00000/06134-%E8%87%BA%E5%8D%97%E5%B8%82%E5%BF%83%E7%90%86%E8%A1%9B%E7%94%9F%E4%B8%AD%E5%BF%83%E6%9C%8D%E5%8B%99%E8%B3%87%E6%BA%90.pdf" target="_blank"><div class="res-type">🏥 臺南市</div><div class="res-name">社區心理衛生中心資源</div><div class="res-detail">免費諮商 · 06-2679751 轉 168</div><span class="res-tag tag-blue">下載資源 PDF ↗</span></a>
+      <div class="res-card" style="cursor:default"><div class="res-type">👪 照顧者</div><div class="res-name">0800-507272 家庭關懷專線</div><div class="res-detail">家庭照顧者心理支持，週一至五 09:00–18:00</div><span class="res-tag tag-green">直接撥打</span></div>
+      <div class="res-card" style="cursor:default"><div class="res-type">🚑 毒品危害</div><div class="res-name">0800-770-885 毒品危害防制</div><div class="res-detail">24 小時服務，全年無休</div><span class="res-tag tag-red">直接撥打</span></div>
+      <div class="res-card" style="cursor:default"><div class="res-type">👨 男性關懷</div><div class="res-name">0800-013-999 男性關懷專線</div><div class="res-detail">每日 07:00–23:00</div><span class="res-tag tag-blue">直接撥打</span></div>
+      <div class="res-card" style="cursor:default"><div class="res-type">🛡 保護服務</div><div class="res-name">113 保護專線</div><div class="res-detail">家暴、性侵、兒少保護，24 小時</div><span class="res-tag tag-red">直接撥打</span></div>
+      <div class="res-card" style="cursor:default"><div class="res-type">🤝 福利諮詢</div><div class="res-name">1957 福利諮詢專線</div><div class="res-detail">社會救助與福利，每日 08:00–22:00</div><span class="res-tag tag-green">直接撥打</span></div>
+      <div class="res-card" style="cursor:default"><div class="res-type">👴 長照服務</div><div class="res-name">1966 長照專線</div><div class="res-detail">長照資源諮詢，週一至五 08:30–17:30</div><span class="res-tag tag-gold">直接撥打</span></div>
+    </div>
+    <div style="margin-top:10px;padding:10px 14px;background:var(--blue-light);border-radius:8px;font-size:12px;color:var(--blue);border:1px solid var(--blue-border)">
+      以上專線資料來源：<a href="https://www.mohw.gov.tw/fp-23-135-1.html" target="_blank" style="color:var(--blue);font-weight:500">衛生福利部諮詢服務專線 ↗</a>
+    </div>
+  </div>
+  <div class="footer">臺南市政府消防局 114–115 年度 EAP 心理健康支持平台</div>
+</div>
+
+<!-- ═══════════════ HR 後台（真實數據）═══════════════ -->
+<div class="page" id="page-hr">
+  <div class="hero">
+    <div class="hero-title" style="color:var(--blue)">HR 管理後台 — 匿名統計儀表板</div>
+    <div class="hero-desc">所有數據已去識別化處理，無法追溯個別員工身份 · 數據來源：Google 試算表即時同步</div>
+  </div>
+
+  <!-- Gemini API 金鑰設定 -->
+  <div class="hr-settings">
+    <div class="hr-settings-title">⚙️ Gemini AI 設定</div>
+    <div class="hr-settings-row">
+      <input type="password" id="hr-gemini-key" placeholder="貼上 Google AI Studio 金鑰（AIza...）">
+      <button class="hr-settings-btn" onclick="saveGeminiKey()">儲存</button>
+    </div>
+    <div class="hr-settings-hint" id="hr-key-status">尚未設定金鑰 · 員工使用時將顯示預設回應文字</div>
+  </div>
+
+  <!-- KPI -->
+  <div class="dash-kpi">
+    <div class="kpi"><div class="kpi-num" id="kpi-total">—</div><div class="kpi-lbl">總使用次數</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpi-top" style="font-size:15px;line-height:1.3">—</div><div class="kpi-lbl">最常見情緒</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpi-month">—</div><div class="kpi-lbl">本月次數</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpi-avg-stress" style="color:var(--gold)">—</div><div class="kpi-lbl">平均壓力指數</div></div>
+  </div>
+
+  <!-- 警示區 -->
+  <div class="alert-box" id="hr-alert" style="display:none"></div>
+
+  <!-- 圖表：情緒分佈 + 月趨勢 -->
+  <div class="charts-2col">
+    <div class="chart-card">
+      <div class="chart-title">🥧 情緒分佈 <button class="hr-refresh" onclick="loadHrData()">🔄 重新整理</button></div>
+      <canvas id="chart-pie" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">📈 每月使用趨勢</div>
+      <canvas id="chart-line" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- 推薦資源統計 -->
+  <div class="chart-card">
+    <div class="chart-title">🎯 各資源推薦次數統計</div>
+    <canvas id="chart-bar" height="160"></canvas>
+  </div>
+
+  <!-- 最近記錄表格 -->
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>時間</th><th>情緒</th><th>壓力指數</th><th>推薦資源</th></tr></thead>
+      <tbody id="hr-table-body">
+        <tr><td colspan="4" style="text-align:center;color:#bbb;padding:24px">載入中...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">HR 後台僅供 EAP 承辦人使用 · 數據去識別化，無法追溯個人身份</div>
+</div>
+
+<script>
+// ── 設定 ──
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzxBPnmPRxdnR99HU6i7gqhBeAJKNRFhw4iEIZalFLbwzizu0j61wXUtRiPGvrHsVqYSQ/exec';
+const cfg = {
+  get geminiKey() { return localStorage.getItem('eap_gemini_key') || 'AIzaSyAoyf-pwmetK6Px8x9rtUP3HQ9Qf-a4sOo'; },
+  set geminiKey(v) { localStorage.setItem('eap_gemini_key', v); },
+};
+
+let mood = null;
+const HR_PASSWORD = 'cl3';
+
+// ── Gemini API ──
+const FIELD_KEYWORDS = /執勤|出勤|救災|火場|搶救|勤務|夜班|備勤|緊急救護|消防|火災|意外|現場|傷亡|燒|爆|災/;
+
+async function callGemini(mood, txt, stress) {
+  const key = cfg.geminiKey;
+  if (!key) return '';
+  const isField = txt && FIELD_KEYWORDS.test(txt);
+  const contextLine = isField
+    ? '2. 結合消防執勤／救災情境給一句具體的體察'
+    : '2. 給一句貼近職場或生活情境的具體體察';
+  const prompt = `你是臺南市政府消防局 EAP 心理健康支持平台的 AI 助理，服務對象是消防局員工（含內勤與外勤）。
+員工情緒自評：${META[mood].label}
+壓力程度（1-10）：${stress}
+${txt ? '員工描述：' + txt : '（員工未填寫文字描述）'}
+
+請用繁體中文，以溫暖、不說教的語氣，給出 2-3 句簡短回應（不超過 80 字）：
+1. 肯定這個情緒是正常且值得被重視的
+${contextLine}
+3. 溫和鼓勵使用 EAP 或謐時光資源
+只輸出回應文字，不要加標題或編號。`;
+  try {
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.75, maxOutputTokens: 300 }
+        })
+      }
+    );
+    const d = await r.json();
+    if (!r.ok) return '';
+    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  } catch (e) { return ''; }
+}
+
+// ── 儲存到 Google Sheets ──
+async function saveToSheets(moodKey, stress, txt, aiText, resources) {
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emotion: META[moodKey].label,
+        emotionEn: moodKey,
+        stress: parseInt(stress),
+        userInput: txt || '',
+        response: aiText || '',
+        resources: resources.map(r => r.name),
+      })
+    });
+  } catch (e) { /* silent */ }
+}
+
+// ── 分析流程 ──
+const META = {
+  great:   { cls:'b-great',   icon:'😊', label:'開心平靜' },
+  ok:      { cls:'b-ok',      icon:'😐', label:'還好普通' },
+  anxious: { cls:'b-anxious', icon:'😰', label:'焦慮緊張' },
+  sad:     { cls:'b-sad',     icon:'😔', label:'低落疲憊' },
+  angry:   { cls:'b-angry',   icon:'😤', label:'憤怒壓抑' },
+};
+
+const RES = {
+  great:[
+    {icon:'🏃',type:'健康促進',name:'正念減壓工作坊',detail:'每月線上辦理，可報名參加',tag:'tag-green',t:'預防性資源'},
+    {icon:'📖',type:'自學資源',name:'壓力管理自學手冊',detail:'FTP 公共資源區 / 人事室表格下載',tag:'tag-blue',t:'免費下載'},
+  ],
+  ok:[
+    {icon:'🧘',type:'放鬆技巧',name:'5 分鐘正念呼吸練習',detail:'音頻引導，隨時可用',tag:'tag-green',t:'即時使用'},
+    {icon:'📋',type:'自我評估',name:'壓力檢測（謐時光）',detail:'每人 2 次，含個別報告，費用署方支應',tag:'tag-blue',t:'消防署專案'},
+  ],
+  anxious:[
+    {icon:'🔥',type:'消防署專案',name:'謐時光心理諮商所',detail:'個別諮商每年 6 次，加官方 LINE 預約',tag:'tag-gold',t:'強烈建議'},
+    {icon:'📞',type:'即時支持',name:'1925 安心專線',detail:'24 小時免費，全年無休',tag:'tag-red',t:'立即可用'},
+  ],
+  sad:[
+    {icon:'🏛',type:'本局 EAP',name:'人事室心理諮商轉介',detail:'每年 4 小時，完全保密，填具申請表',tag:'tag-red',t:'需要關注'},
+    {icon:'🔥',type:'消防署專案',name:'謐時光個別諮商',detail:'03-3128327，平日 09:00–20:00',tag:'tag-purple',t:'優先推薦'},
+  ],
+  angry:[
+    {icon:'🔥',type:'優先轉介',name:'謐時光 PTSD 個別諮商',detail:'最快當日預約，加入官方 LINE',tag:'tag-red',t:'優先處理'},
+    {icon:'📞',type:'外部資源',name:'張老師 1980',detail:'情緒輔導，週一至六，免費',tag:'tag-gold',t:'立即可用'},
+  ],
+};
+
+const FALLBACK_GENERAL = {
+  great:'你目前的狀態看起來不錯！平時維持健康的生活節奏，是保持狀態最好的方式，有需要也可以善用 EAP 資源。',
+  ok:'整體狀態平穩，這樣就很好。壓力有時是慢慢累積的，建議定期關心自己的身心狀態，有需要就主動使用 EAP 資源。',
+  anxious:'焦慮是可以被處理的情緒，你願意正視它就是第一步。主動尋求支持是保護自己最明智的選擇，謐時光諮商所就是為你而設的資源。',
+  sad:'低落和疲憊的感受需要被認真對待。你不需要一個人撐著，也不需要等到「夠嚴重」才能求助，EAP 和諮商資源都是為你而在的。',
+  angry:'長期壓抑憤怒對身心都有傷害，這樣的情緒值得被認真對待。找一個安全、保密的出口和專業支持，是保護自己最重要的事。',
+};
+const FALLBACK_FIELD = {
+  great:'你目前的狀態看起來不錯！消防工作的高壓很容易悄悄累積，平時就維持健康的生活節奏，是保持狀態最好的方式。',
+  ok:'整體狀態平穩。消防工作的壓力往往不是一次爆發，而是長期積累，建議定期關心自己的身心狀態，有需要就主動使用 EAP 資源。',
+  anxious:'焦慮是可以被處理的情緒，你願意正視它就是第一步。消防工作的高壓環境讓緊張感容易累積，主動尋求支持是保護自己最明智的選擇，謐時光諮商所就是為你而設的資源。',
+  sad:'低落和疲憊的感受需要被認真對待。你不需要一個人撐著，也不需要等到「夠嚴重」才能求助。EAP 和消防署 PTSD 專案都是為你而在的，跨出一步就夠了。',
+  angry:'長期壓抑憤怒對身心都有傷害，消防工作本來就承載著太多。找一個安全、保密的出口和專業支持，是保護自己最重要的事。',
+};
+function getFallback(moodKey, txt) {
+  return (txt && FIELD_KEYWORDS.test(txt) ? FALLBACK_FIELD : FALLBACK_GENERAL)[moodKey] || '';
+}
+
+async function analyze() {
+  if (!mood) { alert('請先選擇你目前的心情'); return; }
+  const txt = document.getElementById('txt').value.trim();
+  const stress = document.getElementById('stress').value;
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('result-wrap').style.display = 'none';
+
+  const aiText = await callGemini(mood, txt, stress);
+
+  document.getElementById('loading').style.display = 'none';
+  const m = META[mood];
+  const banner = document.getElementById('emo-banner');
+  banner.className = 'emo-banner ' + m.cls;
+  document.getElementById('emo-title').textContent = m.icon + '  ' + m.label;
+  document.getElementById('emo-body').textContent = aiText || getFallback(mood, txt);
+
+  document.getElementById('suggest-res').innerHTML = '';
+
+  document.getElementById('result-wrap').style.display = 'block';
+  document.getElementById('result-wrap').scrollIntoView({ behavior:'smooth' });
+
+  // 儲存到 Google Sheets（背景執行）
+  saveToSheets(mood, stress, txt, aiText || getFallback(mood, txt), []);
+}
+
+function reset() {
+  mood = null;
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('txt').value = '';
+  document.getElementById('stress').value = 5;
+  document.getElementById('sv').textContent = '5';
+  document.getElementById('result-wrap').style.display = 'none';
+  document.getElementById('analyzeBtn').disabled = false;
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ── HR 後台 ──
+function openHrLogin() {
+  document.getElementById('hr-overlay').classList.add('show');
+  document.getElementById('hr-pw').value = '';
+  document.getElementById('hr-err').textContent = '';
+  setTimeout(() => document.getElementById('hr-pw').focus(), 50);
+}
+
+function closeHrLogin() {
+  document.getElementById('hr-overlay').classList.remove('show');
+}
+
+function hrLogin() {
+  const pw = document.getElementById('hr-pw').value;
+  if (pw === HR_PASSWORD) {
+    closeHrLogin();
+    window.location.href = 'dashboard.html';
+  } else {
+    const inp = document.getElementById('hr-pw');
+    document.getElementById('hr-err').textContent = '密碼錯誤，請重試';
+    inp.classList.add('err');
+    inp.value = '';
+    setTimeout(() => inp.classList.remove('err'), 400);
+  }
+}
+
+function saveGeminiKey() {
+  const k = document.getElementById('hr-gemini-key').value.trim();
+  cfg.geminiKey = k;
+  document.getElementById('hr-key-status').textContent = k
+    ? '✅ 金鑰已儲存（' + k.slice(0,8) + '...）· 員工使用時將呼叫 Gemini AI'
+    : '⚠ 已清除金鑰';
+}
+
+function goPage(p, btn) {
+  if (p === 'hr') { openHrLogin(); return; }
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function pick(m, el) {
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  mood = m;
+}
+
+// ── Chart.js 後台數據 ──
+let chartPie, chartLine, chartBar;
+
+const EMO_COLORS = {
+  '開心平靜': '#2d9554', '還好普通': '#1a5fa0',
+  '焦慮緊張': '#c8860a', '低落疲憊': '#5a3d9a', '憤怒壓抑': '#b83228',
+};
+
+async function loadHrData() {
+  const tbody = document.getElementById('hr-table-body');
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#bbb;padding:24px">載入中…</td></tr>';
+
+  try {
+    const res = await fetch(GAS_URL + '?t=' + Date.now());
+    const d = await res.json();
+
+    const { emotionCounts = {}, monthlyData = {}, resourceCounts = {}, total = 0, recentEmotions = [] } = d;
+
+    // KPI
+    document.getElementById('kpi-total').textContent = total;
+    const topEmo = Object.entries(emotionCounts).sort((a,b)=>b[1]-a[1])[0];
+    document.getElementById('kpi-top').textContent = topEmo ? topEmo[0] : '—';
+    const thisMonth = new Date().toISOString().slice(0,7);
+    document.getElementById('kpi-month').textContent = monthlyData[thisMonth] || 0;
+
+    // 平均壓力（如果試算表有的話，否則顯示 —）
+    document.getElementById('kpi-avg-stress').textContent = d.avgStress ? d.avgStress.toFixed(1) : '—';
+
+    // 警示
+    const alertEl = document.getElementById('hr-alert');
+    if (topEmo && (topEmo[0] === '低落疲憊' || topEmo[0] === '焦慮緊張' || topEmo[0] === '憤怒壓抑') && total > 0) {
+      alertEl.style.display = 'block';
+      alertEl.innerHTML = `<strong>⚠ 注意：</strong>目前最常見情緒為「${topEmo[0]}」（${topEmo[1]} 次），建議 EAP 承辦人適時啟動主動關懷流程。`;
+    } else {
+      alertEl.style.display = 'none';
+    }
+
+    renderPie(emotionCounts);
+    renderLine(monthlyData);
+    renderBar(resourceCounts);
+    renderTable(recentEmotions, d.recentRecords);
+
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#b83228;padding:24px">載入失敗：請確認 GAS 設定正確<br><small>${e.message}</small></td></tr>`;
+  }
+}
+
+function renderPie(emotionCounts) {
+  const labels = Object.keys(emotionCounts);
+  const values = Object.values(emotionCounts);
+  const colors = labels.map(l => EMO_COLORS[l] || '#aaa');
+
+  if (chartPie) chartPie.destroy();
+  chartPie = new Chart(document.getElementById('chart-pie'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, usePointStyle: true } },
+        tooltip: { callbacks: { label: ctx => {
+          const t = ctx.dataset.data.reduce((a,b)=>a+b,0);
+          return ` ${ctx.label}：${ctx.parsed} 次（${t?Math.round(ctx.parsed/t*100):0}%）`;
+        }}}
+      },
+      cutout: '55%'
+    }
+  });
+}
+
+function renderLine(monthlyData) {
+  const entries = Object.entries(monthlyData).sort((a,b)=>a[0].localeCompare(b[0]));
+  if (entries.length > 1) {
+    const filled = [];
+    const cur = new Date(entries[0][0] + '-01');
+    const end = new Date(entries[entries.length-1][0] + '-01');
+    while (cur <= end) {
+      const k = cur.toISOString().slice(0,7);
+      filled.push([k, monthlyData[k] || 0]);
+      cur.setMonth(cur.getMonth()+1);
+    }
+    entries.length = 0; entries.push(...filled);
+  }
+
+  if (chartLine) chartLine.destroy();
+  const ctx = document.getElementById('chart-line').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,220);
+  grad.addColorStop(0, 'rgba(26,107,60,0.18)');
+  grad.addColorStop(1, 'rgba(26,107,60,0)');
+
+  chartLine = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: entries.map(([k])=>k.replace('-','/')),
+      datasets: [{ label:'使用次數', data: entries.map(([,v])=>v), borderColor:'#1a6b3c', backgroundColor: grad, borderWidth:2.5, pointBackgroundColor:'#1a6b3c', pointRadius:5, tension:0.4, fill:true }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display:false }, tooltip: { mode:'index', intersect:false } },
+      scales: {
+        x: { grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ font:{ size:11 } } },
+        y: { beginAtZero:true, grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ stepSize:1, font:{ size:11 } } }
+      }
+    }
+  });
+}
+
+function renderBar(resourceCounts) {
+  const entries = Object.entries(resourceCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const palette = ['#2d9554','#1a5fa0','#c8860a','#5a3d9a','#b83228','#0891b2','#c05621','#1a6b3c','#7c3aed','#be185d'];
+
+  if (chartBar) chartBar.destroy();
+  chartBar = new Chart(document.getElementById('chart-bar'), {
+    type: 'bar',
+    data: {
+      labels: entries.map(([k])=>k),
+      datasets: [{ label:'推薦次數', data: entries.map(([,v])=>v), backgroundColor: palette.map(c=>c+'CC'), borderColor: palette, borderWidth:1.5, borderRadius:6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ` 推薦 ${ctx.parsed.y} 次` } } },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ font:{ size:11 }, maxRotation:30 } },
+        y: { beginAtZero:true, grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ stepSize:1, font:{ size:11 } } }
+      }
+    }
+  });
+}
+
+function renderTable(recentEmotions, recentRecords) {
+  const tbody = document.getElementById('hr-table-body');
+  const rows = recentRecords || recentEmotions;
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#bbb;padding:24px">尚無記錄</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    const stressNum = parseInt(r.stress || r.stressLevel || 0);
+    const stressCls = stressNum >= 8 ? 's-hi' : stressNum >= 5 ? 's-md' : 's-lo';
+    const stressLabel = stressNum || '—';
+    return `<tr>
+      <td>${r.time || ''}</td>
+      <td>${r.emotion || ''}</td>
+      <td><span class="sbadge ${stressCls}">${stressLabel}</span></td>
+      <td style="font-size:11px;color:#888">${r.resources || r.resource || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
