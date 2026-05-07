@@ -1,1 +1,256 @@
-{"id":"/dashboard.html","path":"/dashboard.html","sha":"a52e6007d28d978ff984d2fdbf3cba69482ffa7a","mime_type":"text/html","size":3009,"site_id":"94b119e5-929b-4ef7-8383-f7d6c4e9e2f9","deploy_id":"69fc7efcaa809000cf858131"}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>後台分析 | EAP 情緒記錄</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Noto Sans TC',system-ui,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+
+    /* ── Lock ── */
+    #lock-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a6b3c,#2d9554)}
+    .lock-card{background:#fff;border-radius:16px;padding:40px 36px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center}
+    .lock-icon{font-size:52px;margin-bottom:16px}
+    .lock-card h2{font-size:22px;font-weight:700;color:#1a6b3c;margin-bottom:6px}
+    .lock-card p{font-size:13px;color:#888;margin-bottom:20px}
+    .lock-card input{width:100%;padding:12px 16px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:14px;font-family:inherit}
+    .lock-card input:focus{border-color:#2d9554}
+    .lock-btn{width:100%;padding:13px;background:#1a6b3c;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+    .lock-btn:hover{background:#155f34}
+    .lock-note{margin-top:12px;font-size:12px;color:#aaa}
+
+    /* ── Dashboard ── */
+    #dashboard{display:none}
+    .dash-wrap{max-width:1140px;margin:0 auto;padding:24px 20px}
+
+    .dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .dash-header h1{font-size:22px;font-weight:700;color:#1a6b3c}
+    .dash-header-right{display:flex;align-items:center;gap:10px}
+    #last-updated{font-size:12px;color:#aaa}
+    .icon-btn{border:none;background:#fff;border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;transition:.15s}
+    .icon-btn:hover{background:#e8f5ee}
+
+    /* Stats */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+    .stat-card{background:#fff;border-radius:14px;padding:20px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .stat-icon{font-size:26px;margin-bottom:8px}
+    .stat-value{font-size:34px;font-weight:700;color:#1a6b3c;line-height:1}
+    .stat-label{font-size:12px;color:#888;margin-top:6px}
+
+    /* Charts */
+    .charts-row{display:grid;grid-template-columns:1fr 1.5fr;gap:20px;margin-bottom:20px}
+    .chart-card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .chart-card h3{font-size:14px;font-weight:700;color:#333;margin-bottom:16px}
+    .chart-card .canvas-wrap{position:relative;height:260px}
+    .chart-full{background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .chart-full h3{font-size:14px;font-weight:700;color:#333;margin-bottom:16px}
+    .chart-full .canvas-wrap{position:relative;height:260px}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;z-index:999;display:none}
+    .toast.show{display:block}
+
+    @media(max-width:768px){
+      .stats-row{grid-template-columns:repeat(2,1fr)}
+      .charts-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Lock Screen -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <h2>後台分析</h2>
+    <p>請輸入管理員密碼</p>
+    <input type="password" id="lock-input" placeholder="••••••" autofocus>
+    <button class="lock-btn" id="lock-btn">進入</button>
+    <p class="lock-note">預設密碼：admin</p>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <h1>📊 EAP 情緒數據後台</h1>
+      <div class="dash-header-right">
+        <span id="last-updated"></span>
+        <button class="icon-btn" id="refresh-btn" title="重新整理">🔄</button>
+        <a href="index.html" class="icon-btn" title="回主頁">🏠</a>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-label">總提交次數</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value" id="stat-top-emotion">—</div>
+        <div class="stat-label">最常見情緒</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value" id="stat-this-month">—</div>
+        <div class="stat-label">本月提交次數</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🌈</div>
+        <div class="stat-value" id="stat-emotion-types">—</div>
+        <div class="stat-label">情緒種類</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>🥧 情緒分佈</h3>
+        <div class="canvas-wrap"><canvas id="pie-chart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>📈 每月趨勢</h3>
+        <div class="canvas-wrap"><canvas id="line-chart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="chart-full">
+      <h3>🎯 各資源推薦次數</h3>
+      <div class="canvas-wrap"><canvas id="bar-chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="dash-toast"></div>
+
+<script>
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxBPnmPRxdnR99HU6i7gqhBeAJKNRFhw4iEIZalFLbwzizu0j61wXUtRiPGvrHsVqYSQ/exec';
+const PASS_KEY = 'emo_dash_pass';
+const getPass = () => localStorage.getItem(PASS_KEY) || 'admin';
+
+const lockScreen = document.getElementById('lock-screen');
+const dashboard  = document.getElementById('dashboard');
+const lockInput  = document.getElementById('lock-input');
+
+function unlock() {
+  if (lockInput.value === getPass() || lockInput.value === 'admin') {
+    lockScreen.style.display = 'none';
+    dashboard.style.display  = 'block';
+    loadData();
+  } else {
+    lockInput.style.borderColor = '#ef4444';
+    lockInput.value = '';
+    lockInput.placeholder = '密碼錯誤，請再試';
+    setTimeout(() => { lockInput.style.borderColor = ''; lockInput.placeholder = '••••••'; }, 1800);
+  }
+}
+document.getElementById('lock-btn').addEventListener('click', unlock);
+lockInput.addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+const EMOTION_COLORS = {
+  開心平靜:'#10B981', 還好普通:'#3B82F6', 焦慮緊張:'#F97316', 低落疲態:'#8B5CF6', 憤怒壓抑:'#EF4444',
+  快樂:'#F59E0B', 悲傷:'#3B82F6', 憤怒:'#EF4444', 焦慮:'#F97316', 壓力:'#8B5CF6',
+  孤獨:'#6B7280', 平靜:'#10B981', 興奮:'#EC4899', 疲倦:'#9CA3AF', 困惑:'#D97706',
+};
+const PALETTE = ['#1a6b3c','#2d9554','#10B981','#3B82F6','#F97316','#8B5CF6','#EF4444','#F59E0B','#EC4899','#6B7280','#D97706','#059669','#7C3AED','#0EA5E9','#DC2626'];
+
+let pieChart, lineChart, barChart;
+
+function showToast(msg) {
+  const t = document.getElementById('dash-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+async function loadData() {
+  const gasUrl = localStorage.getItem('emo_gas_url') || DEFAULT_GAS_URL;
+  document.getElementById('refresh-btn').textContent = '⏳';
+  try {
+    const res  = await fetch(gasUrl + '?t=' + Date.now());
+    const json = await res.json();
+    render(json);
+    document.getElementById('last-updated').textContent = '更新：' + new Date().toLocaleTimeString('zh-TW');
+  } catch (err) {
+    showToast('無法載入資料：' + err.message);
+    renderEmpty();
+  } finally {
+    document.getElementById('refresh-btn').textContent = '🔄';
+  }
+}
+document.getElementById('refresh-btn').addEventListener('click', loadData);
+
+function render(data) {
+  const { emotionCounts={}, monthlyData={}, resourceCounts={}, total=0 } = data;
+  document.getElementById('stat-total').textContent = total;
+  const topEmo = Object.entries(emotionCounts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('stat-top-emotion').textContent = topEmo ? topEmo[0] : '—';
+  const currentMonth = new Date().toISOString().slice(0,7);
+  document.getElementById('stat-this-month').textContent = monthlyData[currentMonth] || 0;
+  document.getElementById('stat-emotion-types').textContent = Object.keys(emotionCounts).length;
+  renderPie(emotionCounts);
+  renderLine(monthlyData);
+  renderBar(resourceCounts);
+}
+
+function renderEmpty() {
+  document.getElementById('stat-total').textContent = '0';
+  document.getElementById('stat-top-emotion').textContent = '—';
+  document.getElementById('stat-this-month').textContent = '0';
+  document.getElementById('stat-emotion-types').textContent = '0';
+  renderPie({}); renderLine({}); renderBar({});
+}
+
+function renderPie(counts) {
+  const labels = Object.keys(counts);
+  const values = Object.values(counts);
+  const colors = labels.map(l => EMOTION_COLORS[l] || '#9CA3AF');
+  if (pieChart) pieChart.destroy();
+  pieChart = new Chart(document.getElementById('pie-chart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels, datasets:[{ data:values, backgroundColor:colors, borderWidth:2, borderColor:'#fff', hoverOffset:8 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'bottom', labels:{ font:{size:12}, padding:12, usePointStyle:true } },
+        tooltip:{ callbacks:{ label: ctx => { const t=ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${ctx.label}：${ctx.parsed} 次（${t?Math.round(ctx.parsed/t*100):0}%）`; } } }
+      }, cutout:'58%'
+    }
+  });
+}
+
+function renderLine(monthlyData) {
+  let entries = Object.entries(monthlyData).sort((a,b)=>a[0].localeCompare(b[0]));
+  if (entries.length > 1) {
+    const filled=[]; const cur=new Date(entries[0][0]+'-01'); const end=new Date(entries[entries.length-1][0]+'-01');
+    while(cur<=end){ const k=cur.toISOString().slice(0,7); filled.push([k,monthlyData[k]||0]); cur.setMonth(cur.getMonth()+1); }
+    entries=filled;
+  }
+  if (lineChart) lineChart.destroy();
+  const ctx = document.getElementById('line-chart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,260);
+  grad.addColorStop(0,'rgba(26,107,60,.22)'); grad.addColorStop(1,'rgba(26,107,60,0)');
+  lineChart = new Chart(ctx, {
+    type:'line',
+    data:{ labels:entries.map(([k])=>k.replace('-','/')), datasets:[{ label:'提交次數', data:entries.map(([,v])=>v), borderColor:'#1a6b3c', backgroundColor:grad, borderWidth:2.5, pointBackgroundColor:'#1a6b3c', pointRadius:5, pointHoverRadius:7, tension:.4, fill:true }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{mode:'index',intersect:false} }, scales:{ x:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:11}}}, y:{beginAtZero:true, grid:{color:'rgba(0,0,0,.05)'}, ticks:{stepSize:1,font:{size:11}}} } }
+  });
+}
+
+function renderBar(resourceCounts) {
+  const entries = Object.entries(resourceCounts).sort((a,b)=>b[1]-a[1]).slice(0,14);
+  const colors = entries.map((_,i)=>PALETTE[i%PALETTE.length]);
+  if (barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById('bar-chart').getContext('2d'), {
+    type:'bar',
+    data:{ labels:entries.map(([k])=>k), datasets:[{ label:'推薦次數', data:entries.map(([,v])=>v), backgroundColor:colors.map(c=>c+'CC'), borderColor:colors, borderWidth:1.5, borderRadius:8 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>` 推薦 ${ctx.parsed.y} 次`}} }, scales:{ x:{grid:{display:false}, ticks:{font:{size:11},maxRotation:30}}, y:{beginAtZero:true, grid:{color:'rgba(0,0,0,.05)'}, ticks:{stepSize:1,font:{size:11}}} } }
+  });
+}
+</script>
+</body>
+</html>
